@@ -28,10 +28,11 @@
     "./colors": "./src/colors/index.ts",
     "./css": "./src/css/index.ts",
     "./observe": "./src/observe/index.ts",
-    "./shim": "./src/shim/index.ts",
-    "./shim/server": "./src/shim/server/index.ts",
     "./server": "./src/server/index.ts",
     "./sheets": "./src/sheets/index.ts",
+    "./shim": "./src/shim/index.ts",
+    "./shim/server": "./src/shim/server/index.ts",
+    "./styled": "./src/styled/index.ts",
     "./package.json": "./package.json"
   },
   "// These are relative from within the dist/ folder": "",
@@ -55,9 +56,13 @@
     "style-vendorizer": "^2.0.0"
   },
   "peerDependencies": {
+    "react": "*",
     "typescript": "^4.1.0"
   },
   "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
     "typescript": {
       "optional": true
     }
@@ -65,6 +70,7 @@
   "devDependencies": {
     "@size-limit/file": "^4.9.1",
     "@types/jsdom": "^16.2.5",
+    "@types/react": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",
     "c8": "^7.3.5",
@@ -81,6 +87,7 @@
     "jsdom": "^16.4.0",
     "lint-staged": ">=10",
     "prettier": "^2.0.5",
+    "react": "^17.0.1",
     "size-limit": "^4.9.1",
     "snoop": "^1.0.2",
     "snowpack": "^3.0.11",
