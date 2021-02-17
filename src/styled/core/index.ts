@@ -8,6 +8,10 @@
 import type { HTMLAttributes } from './jsx'
 import type { Token, TW, Context } from '../../index'
 
+import { tw as defaultTW, apply, hash } from '../../index'
+import { css } from '../../css/index'
+import type { CSSRules, Directive } from '../../types'
+
 export interface CreateElementFunction {
   (type: any, props: {}, ...children: any[]): JSX.Element
 }
@@ -172,8 +176,74 @@ export type WithTags<Factory> = Factory &
       : never
   }
 
+const tagHandler: ProxyHandler<Styled> = {
+  get(target, tag, receiver) {
+    if (typeof tag !== 'string' || tag === 'bind') {
+      return Reflect.get(target, tag, receiver)
+    }
+
+    return target.call((receiver === target ? undefined : receiver) as any, tag as any)
+  },
+}
+
+const withTags = <T extends Styled | Twind>(styled: T): WithTags<T> =>
+  new Proxy(styled, tagHandler) as any
+
+interface Factory {
+  (...tokens: any[]): Directive<CSSRules>
+}
+
+const create = (
+  createElement: CreateElementFunction,
+  factory: Factory,
+  tw: TW,
+  tag: string | ComponentType | JSX.Element | JSX.ElementClass,
+  options: StyledOptions = {},
+  attrs: Attrs[] = [],
+  tokens: unknown[],
+): StyledComponent => {
+}
+
+const tagged = (
+  createElement: CreateElementFunction,
+  factory: Factory,
+  tw: TW,
+  tag: string | ComponentType | JSX.Element | JSX.ElementClass,
+  options: StyledOptions = {},
+  attrs: Attrs[] = [],
+): TaggedTwind | TaggedStyled => {
+  const Tagged = (...tokens: unknown[]) => create(createElement, factory, tw, tag, options, attrs, tokens)
+
+  Tagged.attrs = (newAttrs: any) =>
+    tagged(createElement, factory, tw, tag, options, [...attrs, newAttrs]) as any
+
+  return Tagged
+}
+
+const using = (
+  createElement: CreateElementFunction,
+  factory: Factory,
+  tw: TW | null | undefined | void,
+): Styled | Twind =>
+  function (
+    this: TW | null | undefined | void,
+    tag: string | ComponentType | JSX.Element | JSX.ElementClass,
+    options?: StyledOptions,
+  ): TaggedTwind | TaggedStyled {
+    return tagged(createElement, factory, this || tw || defaultTW, tag, options)
+  }
+
+export interface Bound {
+  styled: WithTags<Styled>
+  twind: WithTags<Twind>
+  bind: (tw?: TW | null | undefined | void) => Bound
+}
+
 export const bind = (
   createElement: CreateElementFunction,
-): { styled: WithTags<Styled>; twind: WithTags<Twind> } => {
-  return {} as any
-}
+  tw?: TW | null | undefined | void,
+): Bound => ({
+  styled: withTags(using(createElement, css, tw) as Styled),
+  twind: withTags(using(createElement, apply, tw) as Twind),
+  bind: (tw) => bind(createElement, tw),
+})

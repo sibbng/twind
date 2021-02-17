@@ -1,6 +1,6 @@
 import * as CSS from 'csstype'
 
-export type Booleanish = boolean | 'true' | 'false';
+export type Booleanish = boolean | 'true' | 'false'
 
 export interface DOMAttributes {
   // Clipboard Events
