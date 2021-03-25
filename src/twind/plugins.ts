@@ -217,11 +217,27 @@ const border: PluginHandler = (params, { theme }, id): CSSRules | string | undef
       )
 }
 
-const transform = (gpu?: boolean): string =>
-  (gpu
-    ? 'translate3d(var(--tw-translate-x,0),var(--tw-translate-y,0),0)'
-    : 'translateX(var(--tw-translate-x,0)) translateY(var(--tw-translate-y,0))') +
-  ' rotate(var(--tw-rotate,0)) skewX(var(--tw-skew-x,0)) skewY(var(--tw-skew-y,0)) scaleX(var(--tw-scale-x,1)) scaleY(var(--tw-scale-y,1))'
+const transform = (properties: CSSRules, transform?: string, gpu?: boolean): CSSRules => ({
+  '@global': {
+    '*': {
+      '--tw-translate-x': '0',
+      '--tw-translate-y': '0',
+      '--tw-rotate': '0',
+      '--tw-skew-x': '0',
+      '--tw-skew-y': '0',
+      '--tw-scale-x': '1',
+      '--tw-scale-y': '1',
+    },
+  },
+  ...properties,
+  transform: [
+    transform,
+    (gpu
+      ? 'translate3d(var(--tw-translate-x,0),var(--tw-translate-y,0),0)'
+      : 'translateX(var(--tw-translate-x,0))translateY(var(--tw-translate-y,0))') +
+      ' rotate(var(--tw-rotate,0))skewX(var(--tw-skew-x,0))skewY(var(--tw-skew-y,0))scaleX(var(--tw-scale-x,1))scaleY(var(--tw-scale-y,1))',
+  ],
+})
 
 // .scale-0	--scale-x: 0;
 // .scale-x-150
@@ -235,11 +251,14 @@ const transform = (gpu?: boolean): string =>
 // .skew-y-1	--skew-y: 1deg;
 const transformXYFunction: PluginHandler = (params, context, id) =>
   params[0] &&
-  (_ = context.theme(id as 'scale' | 'skew' | 'translate', params[1] || params[0])) && {
-    [`--tw-${id}-x`]: params[0] !== 'y' && _,
-    [`--tw-${id}-y`]: params[0] !== 'x' && _,
-    transform: [`${id}${params[1] ? params[0].toUpperCase() : ''}(${_})`, transform()],
-  }
+  (_ = context.theme(id as 'scale' | 'skew' | 'translate', params[1] || params[0])) &&
+  transform(
+    {
+      [`--tw-${id}-x`]: params[0] !== 'y' && _,
+      [`--tw-${id}-y`]: params[0] !== 'x' && _,
+    },
+    `${id}${params[1] ? params[0].toUpperCase() : ''}(${_})`,
+  )
 
 const edgesPluginFor = (key: 'margin' | 'padding'): PluginHandler => (params, context, id) =>
   id[1] ? edges(context.theme(key, params), id[1], key) : themeProperty(key)(params, context, id)
@@ -561,26 +580,18 @@ export const corePlugins: Record<string, Plugin | undefined> = {
       : propertyValue()(params, context, id),
 
   transform: (params) =>
-    params[0] == 'none'
-      ? { transform: 'none' }
-      : {
-          '--tw-translate-x': '0',
-          '--tw-translate-y': '0',
-          '--tw-rotate': '0',
-          '--tw-skew-x': '0',
-          '--tw-skew-y': '0',
-          '--tw-scale-x': '1',
-          '--tw-scale-y': '1',
-          transform: transform(params[0] == 'gpu'),
-        },
+    params[0] == 'none' ? { transform: 'none' } : transform({}, '', params[0] == 'gpu'),
 
   // .rotate-0	--transform-rotate: 0;
   // .rotate-1	--transform-rotate: 1deg;
   rotate: (params, { theme }) =>
-    (_ = theme('rotate', params)) && {
-      '--tw-rotate': _,
-      transform: [`rotate(${_})`, transform()],
-    },
+    (_ = theme('rotate', params)) &&
+    transform(
+      {
+        '--tw-rotate': _,
+      },
+      `rotate(${_})`,
+    ),
 
   scale: transformXYFunction,
   translate: transformXYFunction,

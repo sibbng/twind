@@ -67,13 +67,15 @@ test('already hashed rule can be negated', ({ tw }) => {
 test('transform', ({ tw, sheet }) => {
   assert.is(tw('transform'), 'tw-dmb5fl')
   assert.equal(sheet.target, [
-    '.tw-dmb5fl{--tw-1e4pbj4:0;--tw-142admc:0;--tw-9ouawy:0;--tw-wnlb2r:0;--tw-o4ir2d:0;--tw-vkgkf8:1;--tw-1lff04g:1;transform:translateX(var(--tw-1e4pbj4,0)) translateY(var(--tw-142admc,0)) rotate(var(--tw-9ouawy,0)) skewX(var(--tw-wnlb2r,0)) skewY(var(--tw-o4ir2d,0)) scaleX(var(--tw-vkgkf8,1)) scaleY(var(--tw-1lff04g,1))}',
+    '*{--tw-1e4pbj4:0;--tw-142admc:0;--tw-9ouawy:0;--tw-wnlb2r:0;--tw-o4ir2d:0;--tw-vkgkf8:1;--tw-1lff04g:1}',
+    '.tw-dmb5fl{transform:translateX(var(--tw-1e4pbj4,0)) translateY(var(--tw-142admc,0)) rotate(var(--tw-9ouawy,0)) skewX(var(--tw-wnlb2r,0)) skewY(var(--tw-o4ir2d,0)) scaleX(var(--tw-vkgkf8,1)) scaleY(var(--tw-1lff04g,1))}',
   ])
 })
 
 test('scale', ({ tw, sheet }) => {
   assert.is(tw('scale-90'), 'tw-aytitt')
   assert.equal(sheet.target, [
+    '*{--tw-1e4pbj4:0;--tw-142admc:0;--tw-9ouawy:0;--tw-wnlb2r:0;--tw-o4ir2d:0;--tw-vkgkf8:1;--tw-1lff04g:1}',
     '.tw-aytitt{--tw-vkgkf8:0.9;--tw-1lff04g:0.9;transform:scale(0.9);transform:translateX(var(--tw-1e4pbj4,0)) translateY(var(--tw-142admc,0)) rotate(var(--tw-9ouawy,0)) skewX(var(--tw-wnlb2r,0)) skewY(var(--tw-o4ir2d,0)) scaleX(var(--tw-vkgkf8,1)) scaleY(var(--tw-1lff04g,1))}',
   ])
 })
